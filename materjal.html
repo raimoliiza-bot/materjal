@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materjali kalkulaator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#1a1a1a;--ink2:#555;--ink3:#999;
+  --line:#d8d4cc;--line2:#ede9e3;
+  --paper:#faf9f6;--paper2:#f3f0ea;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-t:#1d4ed8;
+  --green:#16a34a;--green-bg:#f0fdf4;
+  --r:10px;--r2:14px;
+}
+html,body{min-height:100%;background:#e8e4dc;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;display:flex;justify-content:center;padding:16px;}
+.app{width:100%;max-width:420px;background:var(--paper);border-radius:var(--r2);overflow:hidden;align-self:flex-start;}
+.head{background:var(--paper2);border-bottom:1.5px solid var(--line);padding:16px 18px 0;}
+.head-title{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:14px;}
+.tabs{display:flex;}
+.tab{flex:1;padding:10px 0;text-align:center;font-size:14px;font-weight:500;color:var(--ink3);border-bottom:2.5px solid transparent;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;}
+.tab.on{color:var(--blue-t);border-bottom-color:var(--blue);}
+.body{padding:16px;}
+.s-label{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:18px;}
+.tog-btn{padding:11px 0;border-radius:var(--r);border:1.5px solid var(--line);background:var(--paper);color:var(--ink2);font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;}
+.tog-btn.on{border-color:var(--blue);background:var(--blue-bg);color:var(--blue-t);font-weight:600;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:6px;}
+.field input,.field select{width:100%;padding:11px 12px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font-family:inherit;font-size:16px;outline:none;-webkit-appearance:none;}
+.field input:focus,.field select:focus{border-color:var(--blue);}
+.field .hint{font-size:11px;color:var(--ink3);margin-top:4px;}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:var(--r);overflow:hidden;}
+.stepper input{flex:1;padding:11px 8px;border:none;background:var(--paper);color:var(--ink);font-family:inherit;font-size:16px;text-align:center;outline:none;min-width:0;-webkit-appearance:none;}
+.step-btn{width:52px;flex-shrink:0;padding:11px 0;background:var(--paper2);border:none;font-size:24px;font-weight:300;color:var(--ink2);cursor:pointer;font-family:inherit;line-height:1;}
+.step-btn:active{background:var(--line2);}
+.step-btn.left{border-right:1px solid var(--line);}
+.step-btn.right{border-left:1px solid var(--line);}
+.btn-calc{width:100%;padding:15px;border-radius:var(--r2);border:none;background:var(--blue);color:#fff;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:14px;}
+.btn-calc:active{opacity:.85;}
+.result{background:var(--green-bg);border:1.5px solid #bbf7d0;border-radius:var(--r2);padding:16px;}
+.result-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.result-row.total{margin-bottom:0;padding-top:10px;border-top:1px solid #bbf7d0;}
+.result-label{font-size:13px;color:var(--green);}
+.result-val{font-size:22px;font-weight:600;color:var(--green);}
+.result-val.big{font-size:26px;}
+.result-mat{font-size:12px;color:var(--green);margin-bottom:12px;opacity:.8;}
+.err-note{font-size:13px;color:var(--ink3);text-align:center;padding:4px 0;}
+.mat-head{display:flex;padding:8px 14px;background:var(--paper2);border-bottom:1.5px solid var(--line);font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;gap:8px;}
+.mat-head .cn{flex:1;}
+.mat-head .cd{width:68px;text-align:right;flex-shrink:0;}
+.mat-head .cp{width:88px;text-align:right;flex-shrink:0;}
+.mat-rows{border-left:1.5px solid var(--line);border-right:1.5px solid var(--line);border-bottom:1.5px solid var(--line);border-radius:0 0 var(--r2) var(--r2);overflow:hidden;}
+.mat-row{display:flex;align-items:center;border-bottom:1px solid var(--line2);padding:10px 14px;gap:8px;}
+.mat-row:last-child{border-bottom:none;}
+.mat-name{flex:1;font-size:14px;font-weight:500;color:var(--ink);}
+.mat-density{font-size:12px;color:var(--ink3);width:68px;text-align:right;flex-shrink:0;}
+.mat-price-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0;width:88px;justify-content:flex-end;}
+.mat-price-input{width:62px;padding:7px 8px;border-radius:var(--r);border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font-family:inherit;font-size:14px;text-align:right;outline:none;}
+.mat-price-input:focus{border-color:var(--blue);}
+.mat-unit{font-size:12px;color:var(--ink3);}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+const MATS=[
+  {n:'Alumiinium',d:2700,p:8.00},
+  {n:'POM ESD',d:1453,p:28.00},
+  {n:'Teras',d:7800,p:1.00},
+  {n:'AISI 304',d:7800,p:5.50},
+  {n:'AISI 316',d:7800,p:5.50},
+  {n:'Messing',d:8600,p:6.50},
+  {n:'Pronks',d:8890,p:13.00},
+  {n:'Vask',d:8890,p:8.50},
+  {n:'Teflon',d:2600,p:30.00},
+  {n:'POM-C',d:1453,p:10.00},
+  {n:'PE',d:950,p:7.50},
+  {n:'Zellamiid valge',d:1453,p:33.00},
+  {n:'Zellamiid must',d:1453,p:30.00},
+  {n:'Trollitax',d:1515,p:14.00},
+  {n:'Arne',d:7800,p:6.00},
+  {n:'Impax',d:7800,p:6.00},
+  {n:'Hardocs',d:7800,p:0.00},
+  {n:'PEEK',d:1320,p:190.00},
+];
+
+// Use window-level vars so inline handlers can access them
+window.prices = MATS.map(m => m.p);
+window.activeTab = 'calc';
+window.calcType = 'round';
+
+window.setTab = function(t){ window.activeTab = t; render(); };
+window.setType = function(t){ window.calcType = t; render(); };
+window.setPrice = function(i, v){ window.prices[i] = parseFloat(v) || 0; };
+
+window.stepThick = function(d){
+  var el = document.getElementById('f-t');
+  if(!el) return;
+  var cur = parseFloat(el.value) || 1;
+  el.value = String(Math.max(0.5, Math.round((cur + d) * 2) / 2));
+};
+
+window.stepQty = function(id, d){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.value = Math.max(1, (parseInt(el.value) || 1) + d);
+};
+
+window.doCalc = function(){
+  var matIdx = parseInt(document.getElementById('f-mat').value);
+  var m = MATS[matIdx];
+  var pr = window.prices[matIdx];
+  var mass, unitMass, qty;
+
+  if(window.calcType === 'round'){
+    var d = parseFloat(document.getElementById('f-diam').value);
+    var l = parseFloat(document.getElementById('f-len').value);
+    qty = parseInt(document.getElementById('f-qty').value) || 1;
+    if(d > 0 && l > 0){
+      unitMass = (Math.PI/4) * (d/1000) * (d/1000) * (l/1000) * m.d;
+      mass = unitMass * qty;
+    }
+  } else {
+    var w = parseFloat(document.getElementById('f-w').value);
+    var sl = parseFloat(document.getElementById('f-sl').value);
+    var t = parseFloat(document.getElementById('f-t').value);
+    qty = parseInt(document.getElementById('f-sq').value) || 1;
+    if(w > 0 && sl > 0 && t > 0){
+      unitMass = (w/1000) * (sl/1000) * (t/1000) * m.d;
+      mass = unitMass * qty;
+    }
+  }
+
+  var el = document.getElementById('result-area');
+  if(!el) return;
+
+  if(!mass){
+    el.innerHTML = '<p class="err-note">Kontrolli et koik mootmed on sisestatud</p>';
+    return;
+  }
+
+  function fmt(n){ return n>=100 ? n.toFixed(1) : n>=10 ? n.toFixed(2) : n.toFixed(3); }
+  function fmtEur(n){ return n>=1000 ? n.toFixed(0) : n>=100 ? n.toFixed(1) : n.toFixed(2); }
+
+  el.innerHTML = '<div class="result">'
+    + '<div class="result-mat">' + m.n + '</div>'
+    + '<div class="result-row"><span class="result-label">1 tk kaal</span><span class="result-val">' + fmt(unitMass) + ' kg</span></div>'
+    + (qty > 1 ? '<div class="result-row"><span class="result-label">' + qty + ' tk kaal</span><span class="result-val">' + fmt(mass) + ' kg</span></div>' : '')
+    + '<div class="result-row total"><span class="result-label">Hind kokku</span><span class="result-val big">' + fmtEur(mass * pr) + ' EUR</span></div>'
+    + '</div>';
+};
+
+function render(){
+  var t = window.calcType;
+  var matOpts = MATS.map(function(m,i){ return '<option value="'+i+'">'+m.n+'</option>'; }).join('');
+
+  var calcHtml = '<div class="body">'
+    + '<div class="s-label">Kuju</div>'
+    + '<div class="toggle">'
+    + '<button class="tog-btn'+(t==='round'?' on':'')+'" onclick="setType(\'round\')">Umar</button>'
+    + '<button class="tog-btn'+(t==='sheet'?' on':'')+'" onclick="setType(\'sheet\')">Leht</button>'
+    + '</div>'
+    + '<div class="field"><label>Materjal</label><select id="f-mat">'+matOpts+'</select></div>';
+
+  if(t === 'round'){
+    calcHtml += '<div class="field"><label>Diameeter (mm)</label><input type="number" inputmode="decimal" id="f-diam" placeholder="nt 20"></div>'
+      + '<div class="field"><label>Pikkus (mm)</label><input type="number" inputmode="decimal" id="f-len" placeholder="nt 500"></div>'
+      + '<div class="field"><label>Kogus (tk)</label>'
+      + '<div class="stepper"><button class="step-btn left" onclick="stepQty(\'f-qty\',-1)">-</button>'
+      + '<input type="number" inputmode="numeric" id="f-qty" value="1">'
+      + '<button class="step-btn right" onclick="stepQty(\'f-qty\',1)">+</button></div></div>';
+  } else {
+    calcHtml += '<div class="field"><label>Laius (mm)</label><input type="number" inputmode="decimal" id="f-w" placeholder="nt 200"></div>'
+      + '<div class="field"><label>Pikkus (mm)</label><input type="number" inputmode="decimal" id="f-sl" placeholder="nt 300"></div>'
+      + '<div class="field"><label>Paksus (mm)</label>'
+      + '<div class="stepper"><button class="step-btn left" onclick="stepThick(-1)">-</button>'
+      + '<input type="number" inputmode="decimal" id="f-t" value="3">'
+      + '<button class="step-btn right" onclick="stepThick(1)">+</button></div>'
+      + '<div class="hint">Nupp muudab 1 mm kaupa, saab ka ise kirjutada</div></div>'
+      + '<div class="field"><label>Kogus (tk)</label>'
+      + '<div class="stepper"><button class="step-btn left" onclick="stepQty(\'f-sq\',-1)">-</button>'
+      + '<input type="number" inputmode="numeric" id="f-sq" value="1">'
+      + '<button class="step-btn right" onclick="stepQty(\'f-sq\',1)">+</button></div></div>';
+  }
+
+  calcHtml += '<button class="btn-calc" onclick="doCalc()">Arvuta</button>'
+    + '<div id="result-area"></div></div>';
+
+  var matsHtml = '<div class="body" style="padding:0;">'
+    + '<div class="mat-head"><span class="cn">Materjal</span><span class="cd">kg/m3</span><span class="cp">EUR/kg</span></div>'
+    + '<div class="mat-rows">'
+    + MATS.map(function(m,i){
+        return '<div class="mat-row">'
+          + '<span class="mat-name">'+m.n+'</span>'
+          + '<span class="mat-density">'+m.d+'</span>'
+          + '<div class="mat-price-wrap">'
+          + '<input class="mat-price-input" type="number" inputmode="decimal" value="'+window.prices[i]+'" onchange="setPrice('+i+',this.value)">'
+          + '<span class="mat-unit">e</span></div></div>';
+      }).join('')
+    + '</div></div>';
+
+  var activeTab = window.activeTab;
+  document.getElementById('app').innerHTML =
+    '<div class="head">'
+    + '<div class="head-title">Materjali kalkulaator</div>'
+    + '<div class="tabs">'
+    + '<button class="tab'+(activeTab==='calc'?' on':'')+'" onclick="setTab(\'calc\')">Arvuta</button>'
+    + '<button class="tab'+(activeTab==='mats'?' on':'')+'" onclick="setTab(\'mats\')">Materjalid ja hinnad</button>'
+    + '</div></div>'
+    + (activeTab === 'calc' ? calcHtml : matsHtml);
+}
+
+render();
+</script>
+</body>
+</html>
